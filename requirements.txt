@@ -1,0 +1,8 @@
+backports.tarfile
+django
+importlib-metadata
+jaraco.collections
+packaging
+platformdirs
+pretty-errors
+tomli
