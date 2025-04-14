@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta author="Liam Laidlaw">
+    <title>Hand Written Digit Prediction</title>
+    <link rel="stylesheet" href="./styles/main.css">
+</head>
+
+<body>
+    <div id="header-container">
+        <div id="title-container">
+            <h1 class="tourney-italic" id="page-title">
+                HANDWRITTEN DIGIT IDENTIFIER
+            </h1>
+            <a href="about.html">
+                <h3 class="roboto-regular" id="about-link">
+                    About This Project
+                </h3>
+            </a>
+        </div>
+        <div id="sub-header">
+            <h2 class="roboto-regular" id="page-subtitle">
+                Created by Liam Laidlaw
+            </h2>
+        </div>
+    </div>
+
+    <div id="graphic-container">
+        <h2 class="roboto-regular" id='draw-prompt'>Draw a Single Digit Number</h2>
+        <canvas id="canvas" width="20" height="20"></canvas>
+        <button id='clear-button' class="canvas-button">Clear</button>
+        <button id='predict-button' class="canvas-button">Predict</button>
+    </div>
+    
+    <script src="./scripts/canvas-controller.js"></script>
+
+</body>
+</html>
