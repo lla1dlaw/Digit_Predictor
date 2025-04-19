@@ -10,6 +10,11 @@
 window.addEventListener('load', () => {
     resize();
     window.addEventListener('resize', resize);
+    addNetworkOptions()
+    .then()
+    .catch((error) => {
+        console.log("Error: ", error);
+    });
 });
 
 // -------------------------vars & objects----------------------
@@ -25,7 +30,6 @@ const predictButton = document.querySelector('#predict-button');
 let canvasData;
 let grayScaleImage;
 let imageObject;
-let reconnecting = false;
 let serverReconnectDelay = 1000;
 let savedWidth;
 let savedHeight;
@@ -36,60 +40,54 @@ canvas.addEventListener('mousemove', drawCanvas);
 clearButton.addEventListener('click', clearCanvas);
 predictButton.addEventListener('click', () => {
     canvasData = context.getImageData(0, 0, canvas.width, canvas.height).data;
-    console.log(canvasData);
     grayScaleImage = processImageVector(canvasData);
-    imageObject = {"vector": grayScaleImage, "width": canvas.width, "height": canvas.height};
-    console.log(imageObject);
-    sendImageVector(JSON.stringify(imageObject));
+    body = JSON.stringify({
+        "image": grayScaleImage
+    });
+    
+    // request prediction from backend
 });
 
-// let hostname = window.location.hostname;
-let hostname = "localhost";
-let url = `ws://${hostname}:8002`;
-let websocket = new WebSocket(url);
-
-websocket.addEventListener("open", () => {
-    console.log("Connection to server established.");
-    reconnecting = false;
-});
-
-websocket.addEventListener("close", () => {
-    console.log("Connection to server closed.");
-    // if (!reconnecting) {
-    //     attemptReconnection();
-    // }
-});
-
-websocket.addEventListener("message", (event) => {
-    printIncommingMessage(event.data);
-});
-
-//connectWebSocket(); // establish initial connection to server
 
 // ------------- functions --------------
 
-function connectWebSocket() {
-    // re-create websocket
-    websocket = new WebSocket(url);
-}
 
-// async function attemptReconnection() {
-//     reconnecting = true;
-//     console.log("Attempting to reconnect...");
-//     while (websocket.readyState != WebSocket.OPEN && websocket.readyState != WebSocket.CONNECTING) {
-//         try{
-//             connectWebSocket(); // attempt to re-establish connection
-//             await new Promise(resolve => setTimeout(resolve, serverReconnectDelay));
-//         } catch (error) {
-//             console.log("Error: " + error);
-//         }
-//     }
-//     reconnecting = false;
-// }
 
-function printIncommingMessage(data) {
-    const message = JSON.parse(data);
-    console.log(message);
+async function addNetworkOptions() {
+
+    // clear network select menu elements and add placeholder option
+    const select = document.getElementById("select-network-type");
+    select.innerHTML = ''; // ensure select tag is empty
+    const placeHolder = document.createElement('option');
+    placeHolder.value = "";
+    placeHolder.text = "-- Select a Network --";
+    placeHolder.class = "roboto-regular";
+    select.appendChild(placeHolder);
+    // gets a list of available model architechtures from the MNISTPredictor microservice
+    url = "/get_available_networks";
+    let available_networks;
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok){
+            throw new Error(`Response status: ${response.status}`);
+        }
+
+        available_networks = await response.json();
+    } catch (error) {
+        console.error(error.message);
+    }
+
+    console.log(typeof available_networks);
+    // populate select with available options from microservice
+    available_networks.forEach(option => {
+        const e = document.createElement('option');
+        e.value = option;
+        e.text = option;
+        e.class = "roboto-regular";
+        e.id = option;
+        select.appendChild(e);
+    });
 }
 
 
@@ -158,14 +156,6 @@ function drawCanvas(mouseEvent) {
 }
 
 
-function sendImageVector(message) {
-    if (websocket.readyState == 0) {
-        console.log("Server not connected at this time.");
-    } else {
-        websocket.send(message);
-    }
-    
-}
 
 function processImageVector(imageVector) { // removes the rgb values from the image data and returns only the alpha values (0: white - 255: black)
     let processedImageVector = [];

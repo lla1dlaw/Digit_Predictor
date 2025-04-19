@@ -20,8 +20,26 @@ a {
 
 /* ids */
 
+#canvas-title-container {
+    display: flex;
+    flex-direction: row;
+}
+
 #graphic-container {
     margin: 100px 50px;
+    float: left; 
+}
+
+#draw-prompt {
+    display: flex; 
+    float: left;
+}
+
+#select-network-type {
+    display: flex;
+    margin-left: 50px;
+    float: left;
+    border-radius: 5px;
 }
 
 #draw-prompt {

@@ -29,12 +29,14 @@
     </div>
 
     <div id="graphic-container">
-        <h2 class="roboto-regular" id='draw-prompt'>Draw a Single Digit Number</h2>
+        <div id="canvas-title-container">
+            <h2 class="roboto-regular" id='draw-prompt'>Draw a Single Digit Number</h2>
+            <select name="Choose Network" id="select-network-type"></select>
+        </div>
         <canvas id="canvas" width="20" height="20"></canvas>
         <button id='clear-button' class="canvas-button">Clear</button>
         <button id='predict-button' class="canvas-button">Predict</button>
     </div>
-    
     <script src="../static/scripts/canvas-controller.js"></script>
 
 </body>
