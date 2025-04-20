@@ -41,7 +41,7 @@ canvas.addEventListener('mousedown', startDrawing);
 canvas.addEventListener('mouseup', stopDrawing);
 canvas.addEventListener('mousemove', drawCanvas);
 clearButton.addEventListener('click', clearCanvas);
-predictButton.addEventListener('click', () => {
+predictButton.addEventListener('click', async () => {
     predictButton.disabled = true;
     const selected_net = select.value;
     canvasData = context.getImageData(0, 0, canvas.width, canvas.height).data;
@@ -51,8 +51,10 @@ predictButton.addEventListener('click', () => {
         "image": grayScaleImage
     });
     // request prediction from backend
-    pred_info = get_inference(body); // includes prediction and layer activations
-
+    pred_info = await get_inference(body); // includes prediction and layer activations
+    console.log(`Predicted Value: ${pred_info['prediction']}`)
+    let activations = pred_info['activations']
+    
     predictButton.disabled = false;
     
 });
@@ -72,7 +74,7 @@ async function get_inference(body) {
             headers: { "Content-Type": "application/json"},
             body: body
         });
-        return response;
+        return response.json();
     
     } catch (error) {
         console.error(error.message);

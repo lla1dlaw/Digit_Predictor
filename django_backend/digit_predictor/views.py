@@ -25,7 +25,6 @@ def infer(request):
         try:
             body = json.loads(request.body)
             response = requests.post(microservice_url, json=body, headers={"Content-Type": "application/json"}).json()
-            print(f"Response: {response}")
             return JsonResponse(response, status=200)
         
         except json.JSONDecodeError:
