@@ -13,7 +13,7 @@ window.addEventListener('load', () => {
     addNetworkOptions()
     .then()
     .catch((error) => {
-        console.log("Error: ", error);
+        console.error(error.message);
     });
 });
 
@@ -26,6 +26,9 @@ const canvas = document.querySelector('#canvas');
 const context = canvas.getContext('2d', { willReadFrequently: true }); // context for 2d canvas operations
 const clearButton = document.querySelector('#clear-button');
 const predictButton = document.querySelector('#predict-button');
+const select = document.getElementById("select-network-type");
+const networkCanvas = document.getElementById("network-canvas");
+const networkContext = networkCanvas.getContext('2d', { willReadFrequently: true });
 
 let canvasData;
 let grayScaleImage;
@@ -39,28 +42,51 @@ canvas.addEventListener('mouseup', stopDrawing);
 canvas.addEventListener('mousemove', drawCanvas);
 clearButton.addEventListener('click', clearCanvas);
 predictButton.addEventListener('click', () => {
+    predictButton.disabled = true;
+    const selected_net = select.value;
     canvasData = context.getImageData(0, 0, canvas.width, canvas.height).data;
     grayScaleImage = processImageVector(canvasData);
     body = JSON.stringify({
+        "model": selected_net,
         "image": grayScaleImage
     });
-    
     // request prediction from backend
+    pred_info = get_inference(body); // includes prediction and layer activations
+
+    predictButton.disabled = false;
+    
 });
 
 
 // ------------- functions --------------
 
 
+async function get_inference(body) {
+    url = "/infer";
+    let response;
+
+    try {
+        console.log("Sending Request to backend")
+        response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json"},
+            body: body
+        });
+        return response;
+    
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+
 
 async function addNetworkOptions() {
 
     // clear network select menu elements and add placeholder option
-    const select = document.getElementById("select-network-type");
     select.innerHTML = ''; // ensure select tag is empty
     const placeHolder = document.createElement('option');
     placeHolder.value = "";
-    placeHolder.text = "-- Select a Network --";
+    placeHolder.text = "-- Select Model --";
     placeHolder.class = "roboto-regular";
     select.appendChild(placeHolder);
     // gets a list of available model architechtures from the MNISTPredictor microservice
